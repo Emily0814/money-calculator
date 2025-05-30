@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이자 계산기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container">
+            <a class="navbar-brand" href="/">금융 계산기</a>
+            <a href="/" class="btn btn-outline-light">홈으로</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">복리 이자 계산기</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="interestForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">원금 (원)</label>
+                                        <input type="number" class="form-control" id="principal" placeholder="1000000" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">연이율 (%)</label>
+                                        <input type="number" class="form-control" id="rate" step="0.1" placeholder="3.5" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">기간 (년)</label>
+                                <input type="number" class="form-control" id="years" placeholder="5" required>
+                            </div>
+                            
+                            <button type="button" class="btn btn-success w-100 mb-3" onclick="calculateInterest()">계산하기</button>
+                        </form>
+                        
+                        <div id="result" class="alert alert-info" style="display:none;">
+                            <h5>계산 결과</h5>
+                            <p><strong>원금:</strong> <span id="resultPrincipal"></span>원</p>
+                            <p><strong>최종 금액:</strong> <span id="resultAmount"></span>원</p>
+                            <p><strong>이자:</strong> <span id="resultInterest"></span>원</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateInterest() {
+            const principal = document.getElementById('principal').value;
+            const rate = document.getElementById('rate').value;
+            const years = document.getElementById('years').value;
+            
+            if (!principal || !rate || !years) {
+                alert('모든 값을 입력해주세요.');
+                return;
+            }
+            
+            fetch('/api/interest', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `principal=${principal}&rate=${rate}&years=${years}&type=compound`
+            })
+            .then(response => response.text())
+            .then(result => {
+                const finalAmount = parseFloat(result);
+                const interest = finalAmount - parseFloat(principal);
+                
+                document.getElementById('resultPrincipal').textContent = parseInt(principal).toLocaleString();
+                document.getElementById('resultAmount').textContent = Math.round(finalAmount).toLocaleString();
+                document.getElementById('resultInterest').textContent = Math.round(interest).toLocaleString();
+                document.getElementById('result').style.display = 'block';
+            })
+            .catch(error => {
+                alert('계산 오류가 발생했습니다.');
+                console.error(error);
+            });
+        }
+    </script>
+</body>
+</html>

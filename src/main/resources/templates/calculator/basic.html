@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기본 계산기</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">금융 계산기</a>
+            <a href="/" class="btn btn-outline-light">홈으로</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">기본 계산기</h3>
+                    </div>
+                    <div class="card-body">
+                        <input type="text" class="form-control form-control-lg text-end mb-3" id="display" readonly>
+                        
+                        <div class="row g-2">
+                            <div class="col-3"><button class="btn btn-danger w-100" onclick="clearDisplay()">C</button></div>
+                            <div class="col-3"><button class="btn btn-secondary w-100" onclick="deleteLast()">←</button></div>
+                            <div class="col-3"><button class="btn btn-warning w-100" onclick="appendOperator('/')">/</button></div>
+                            <div class="col-3"><button class="btn btn-warning w-100" onclick="appendOperator('*')">×</button></div>
+                            
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('7')">7</button></div>
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('8')">8</button></div>
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('9')">9</button></div>
+                            <div class="col-3"><button class="btn btn-warning w-100" onclick="appendOperator('-')">-</button></div>
+                            
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('4')">4</button></div>
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('5')">5</button></div>
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('6')">6</button></div>
+                            <div class="col-3"><button class="btn btn-warning w-100" onclick="appendOperator('+')">+</button></div>
+                            
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('1')">1</button></div>
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('2')">2</button></div>
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('3')">3</button></div>
+                            <div class="col-3"><button class="btn btn-success w-100" onclick="calculate()" style="height: 120px;">=</button></div>
+                            
+                            <div class="col-6"><button class="btn btn-outline-primary w-100" onclick="appendNumber('0')">0</button></div>
+                            <div class="col-3"><button class="btn btn-outline-primary w-100" onclick="appendNumber('.')">.</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '';
+        let operator = '';
+        let previousInput = '';
+
+        function appendNumber(num) {
+            currentInput += num;
+            display.value = currentInput;
+        }
+
+        function appendOperator(op) {
+            if (currentInput === '') return;
+            
+            if (previousInput !== '' && operator !== '') {
+                calculate();
+            }
+            
+            operator = op;
+            previousInput = currentInput;
+            currentInput = '';
+            display.value = previousInput + ' ' + (op === '*' ? '×' : op) + ' ';
+        }
+
+        function calculate() {
+            if (previousInput === '' || currentInput === '' || operator === '') return;
+            
+            fetch('/api/calculate', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `num1=${previousInput}&num2=${currentInput}&operator=${operator}`
+            })
+            .then(response => response.text())
+            .then(result => {
+                display.value = result;
+                currentInput = result;
+                previousInput = '';
+                operator = '';
+            })
+            .catch(error => {
+                alert('계산 오류가 발생했습니다.');
+                console.error(error);
+            });
+        }
+
+        function clearDisplay() {
+            currentInput = '';
+            previousInput = '';
+            operator = '';
+            display.value = '';
+        }
+
+        function deleteLast() {
+            currentInput = currentInput.slice(0, -1);
+            display.value = currentInput;
+        }
+    </script>
+</body>
+</html>
