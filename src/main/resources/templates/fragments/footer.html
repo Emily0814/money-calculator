@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <footer th:fragment="footer" class="bg-dark text-light mt-5 py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-calculator"></i> 금융 계산기</h5>
+                    <p class="mb-0">개인 금융 관리를 위한 종합 계산 도구</p>
+                    <small class="text-muted">Spring Boot + Oracle DB 기반</small>
+                </div>
+                <div class="col-md-3">
+                    <h6>주요 기능</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/basic" class="text-light text-decoration-none">기본 계산기</a></li>
+                        <li><a href="/interest" class="text-light text-decoration-none">이자 계산기</a></li>
+                        <li><a href="/loan" class="text-light text-decoration-none">대출 계산기</a></li>
+                        <li><a href="/exchange" class="text-light text-decoration-none">환율 계산기</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6>정보</h6>
+                    <ul class="list-unstyled">
+                        <li><a href="/history" class="text-light text-decoration-none">계산 기록</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">API 문서</a></li>
+                        <li><a href="#" class="text-light text-decoration-none">도움말</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="my-3">
+            <div class="row">
+                <div class="col-md-6">
+                    <small>&copy; 2025 금융 계산기. 금융IT 개발자 되기 프로젝트. Version 1.0</small>
+                </div>
+                <div class="col-md-6 text-end">
+                    <small>
+                        Made with <i class="fas fa-heart text-danger"></i> by  
+            			<a href="https://github.com/Emily0814" target="_blank" rel="noopener noreferrer" class="text-white">
+            			<i class="fab fa-github fa-lg"></i>
+            			</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

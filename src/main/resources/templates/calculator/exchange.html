@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/common :: head('금융 계산기 - 홈')"></head>
+<body>
+    <div th:replace="fragments/header :: navbar('home')"></div>
+
+    <div class="container mt-5 likebody">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">실시간 환율 계산기</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="exchangeForm">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">환전할 금액</label>
+                                        <input type="number" class="form-control" id="amount" placeholder="1000" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">기준 통화</label>
+                                        <select class="form-select" id="fromCurrency">
+                                            <option value="KRW" selected>KRW (원)</option>
+                                            <option value="USD">USD (달러)</option>
+                                            <option value="EUR">EUR (유로)</option>
+                                            <option value="JPY">JPY (엔)</option>
+                                            <option value="CNY">CNY (위안)</option>
+                                            <option value="GBP">GBP (파운드)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">환전 통화</label>
+                                        <select class="form-select" id="toCurrency">
+                                            <option value="USD" selected>USD (달러)</option>
+                                            <option value="KRW">KRW (원)</option>
+                                            <option value="EUR">EUR (유로)</option>
+                                            <option value="JPY">JPY (엔)</option>
+                                            <option value="CNY">CNY (위안)</option>
+                                            <option value="GBP">GBP (파운드)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-info" onclick="getCurrentRate()">현재 환율 조회</button>
+                                <button type="button" class="btn btn-primary" onclick="convertCurrency()">환전 계산</button>
+                            </div>
+                        </form>
+                        
+                        <div id="rateResult" class="alert alert-secondary mt-3" style="display:none;">
+                            <h6>현재 환율</h6>
+                            <p class="mb-0"><span id="rateInfo"></span></p>
+                        </div>
+                        
+                        <div id="convertResult" class="alert alert-success mt-3" style="display:none;">
+                            <h5>환전 결과</h5>
+                            <p><strong>환전 금액:</strong> <span id="originalAmount"></span></p>
+                            <p><strong>적용 환율:</strong> <span id="appliedRate"></span></p>
+                            <p class="mb-0"><strong>환전 결과:</strong> <span id="convertedAmount"></span></p>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <small class="text-muted">
+                                * 실시간 환율 정보는 참고용이며, 실제 거래 시에는 각 금융기관의 환율을 확인하시기 바랍니다.
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+	<script th:src="@{/js/exchange.js}" type="text/javascript"></script>
+    <div th:replace="fragments/footer :: footer"></div>
+    <div th:replace="fragments/common :: scripts"></div>
+</body>
+</html>

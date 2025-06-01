@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <nav th:fragment="navbar(currentPage)" class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-calculator"></i> 금융 계산기
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav me-auto">
+                    <a class="nav-link" th:classappend="${currentPage == 'home'} ? 'active' : ''" href="/">
+                        <i class="fas fa-home"></i> 홈
+                    </a>
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-calculator"></i> 계산기
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/basic">
+                                <i class="fas fa-calculator"></i> 기본 계산기
+                            </a></li>
+                            <li><a class="dropdown-item" href="/interest">
+                                <i class="fas fa-percent"></i> 이자 계산기
+                            </a></li>
+                            <li><a class="dropdown-item" href="/loan">
+                                <i class="fas fa-home"></i> 대출 계산기
+                            </a></li>
+                            <li><a class="dropdown-item" href="/exchange">
+                                <i class="fas fa-exchange-alt"></i> 환율 계산기
+                            </a></li>
+                        </ul>
+                    </div>
+                    <a class="nav-link" th:classappend="${currentPage == 'history'} ? 'active' : ''" href="/history">
+                        <i class="fas fa-history"></i> 기록 조회
+                    </a>
+                </div>
+                
+                <!-- 로그인/회원가입 버튼 (나중에 추가) -->
+                <div class="navbar-nav">
+                    <a class="nav-link" href="/login">
+                        <i class="fas fa-sign-in-alt"></i> 로그인
+                    </a>
+                    <a class="nav-link" href="/signup">
+                        <i class="fas fa-user-plus"></i> 회원가입
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+</html>
