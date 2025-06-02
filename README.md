@@ -133,7 +133,7 @@ public class CalcController {
 ## 🔗 관련 링크
 
 - [📝 프로젝트 개발 후기 (velog)](https://velog.io/@ajaajas/금융IT-개발자되기-프로젝트-Spring-Boot-Oracle-DB-금융-계산기-프로젝트)
-- 🚀 [👉 배포 사이트 보기](https://money-calculator-hdld.onrender.com)
+- 🌐[배포 사이트 보기](https://money-calculator-hdld.onrender.com)
 
 ## 📄 라이선스
 
