@@ -78,45 +78,95 @@ src/main/resources/
 
 ## 💻 핵심 코드
 
-### Entity 설계
+### 1. 복리 계산 로직 : Math.pow() 활용한 금융 공식 구현
+<details><summary>📋 코드 보기</summary>
+```java
+public double calculateCompoundInterest(double principal, double rate, int years) {
+    double result = principal * Math.pow(1 + rate/100, years);
+    
+    saveCalculationHistory("interest", 
+        String.format("{\"principal\":%.2f,\"rate\":%.2f,\"years\":%d,\"type\":\"compound\"}", 
+                     principal, rate, years),
+        String.valueOf(result));
+    
+    return result;
+}
+```
+</details>
+
+### 2. 외부 API 연동 및 예외 처리 : Frankfurter API + 예외처리 + 폴백 로직
+<details><summary>📋 코드 보기</summary>
+```java
+public double getExchangeRate(String fromCurrency, String toCurrency) {
+    try {
+        String url = "https://api.frankfurter.app/latest?from=" + fromCurrency + "&to=" + toCurrency;
+        
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("GET");
+        connection.setConnectTimeout(5000);
+        connection.setReadTimeout(5000);
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        StringBuilder response = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+        reader.close();
+        
+        JsonNode jsonNode = objectMapper.readTree(response.toString());
+        JsonNode rates = jsonNode.get("rates");
+        
+        if (rates.has(toCurrency)) {
+            return rates.get(toCurrency).asDouble();
+        }
+        
+        throw new RuntimeException("지원하지 않는 통화: " + toCurrency);
+        
+    } catch (Exception e) {
+        // API 실패 시 더미 데이터 사용
+        if ("KRW".equals(fromCurrency) && "USD".equals(toCurrency)) {
+            return 0.00073;
+        } else if ("USD".equals(fromCurrency) && "KRW".equals(toCurrency)) {
+            return 1381.4;
+        }
+        return 1.0; // 기본값
+    }
+}
+```
+</details>
+
+### 3. Entity 및 Repository 설계 : JPA Entity + Spring Data Repository 패턴
+<details><summary>📋 코드 보기</summary>
 ```java
 @Entity
 @Table(name = "calculation_history")
 public class CalculationHistory {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "calc_seq")
+    @SequenceGenerator(name = "calc_seq", sequenceName = "CALC_SEQ", allocationSize = 1)
     private Long id;
     
-    @Column(name = "calc_type")
-    private String calcType; // "basic", "interest", "loan", "exchange"
+    @Column(name = "calc_type", nullable = false, length = 20)
+    private String calcType;
     
     @Column(name = "input_data", length = 1000)
     private String inputData; // JSON 형태
     
-    // ...
+    @Column(name = "result", nullable = false)
+    private String result;
+    
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 }
-```
 
-### REST API 설계
-```java
-@Controller
-public class CalcController {
-    
-    @PostMapping("/api/calculate")
-    @ResponseBody
-    public double calculate(@RequestParam("num1") double num1,
-                           @RequestParam("num2") double num2,
-                           @RequestParam("operator") String operator) {
-        return calcService.basicCalculate(num1, num2, operator);
-    }
-    
-    @GetMapping("/api/history/{type}")
-    @ResponseBody
-    public List<CalculationHistory> getHistoryByType(@PathVariable("type") String type) {
-        return calcService.getHistoryByType(type);
-    }
+@Repository
+public interface CalculationHistoryRepository extends JpaRepository<CalculationHistory, Long> {
+    List<CalculationHistory> findByCalcTypeOrderByCreatedAtDesc(String calcType);
+    List<CalculationHistory> findTop10ByOrderByCreatedAtDesc();
 }
 ```
+</details>
 
 ## 🔄 최근 업데이트
 
