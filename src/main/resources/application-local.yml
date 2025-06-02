@@ -4,3 +4,5 @@ spring:
     username: calc
     password: calc1234
     driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
