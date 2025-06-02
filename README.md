@@ -31,6 +31,8 @@
 
 ## 🚀 설치 및 실행
 
+<details><summary>🛠️ 설치 & 실행 가이드</summary>
+    
 ### 사전 요구사항
 - Java 21
 - Oracle Database
@@ -42,8 +44,8 @@
 git clone https://github.com/Emily0814/money-calculator.git
 cd money-calculator
 
-# 2. Oracle DB 설정
-# application.yml에서 DB 정보 수정
+# 2. 로컬 DB 설정 파일 생성
+# src/main/resources/application-local.yml 파일을 생성하고 아래 내용 추가
 
 # 3. 애플리케이션 실행
 ./gradlew bootRun
@@ -51,10 +53,22 @@ cd money-calculator
 # 4. 브라우저에서 접속
 http://localhost:8080
 ```
+```yaml
+# application-local.yml
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1    # host:port/serviceName을 본인 환경에 맞게 수정
+    username: calc                                  # Oracle DB 사용자명
+    password: calc1234                              # Oracle DB 비밀번호
+    driver-class-name: oracle.jdbc.OracleDriver
+```
+
+</details>
 
 ## 📁 프로젝트 구조
-
-```
+<details><summary>📘구조 보기</summary>
+    
+```java
 src/main/java/com/ajaajas/calc/
 ├── CalcApplication.java
 ├── controller/
@@ -75,11 +89,13 @@ src/main/resources/
     ├── css/
     └── js/
 ```
+</details>
 
 ## 💻 핵심 코드
 
 ### 1. 복리 계산 로직 : Math.pow() 활용한 금융 공식 구현
 <details><summary>📋 코드 보기</summary>
+    
 ```java
 public double calculateCompoundInterest(double principal, double rate, int years) {
     double result = principal * Math.pow(1 + rate/100, years);
@@ -96,6 +112,7 @@ public double calculateCompoundInterest(double principal, double rate, int years
 
 ### 2. 외부 API 연동 및 예외 처리 : Frankfurter API + 예외처리 + 폴백 로직
 <details><summary>📋 코드 보기</summary>
+    
 ```java
 public double getExchangeRate(String fromCurrency, String toCurrency) {
     try {
@@ -134,10 +151,13 @@ public double getExchangeRate(String fromCurrency, String toCurrency) {
     }
 }
 ```
+
 </details>
 
 ### 3. Entity 및 Repository 설계 : JPA Entity + Spring Data Repository 패턴
+
 <details><summary>📋 코드 보기</summary>
+    
 ```java
 @Entity
 @Table(name = "calculation_history")
@@ -166,6 +186,7 @@ public interface CalculationHistoryRepository extends JpaRepository<CalculationH
     List<CalculationHistory> findTop10ByOrderByCreatedAtDesc();
 }
 ```
+
 </details>
 
 ## 🔄 최근 업데이트
