@@ -14,9 +14,11 @@ spring:
     username: ${DB_USERNAME:calc}
     password: ${DB_PASSWORD:calc1234}
   jpa:
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:}
     hibernate:
       ddl-auto: update
     show-sql: true
+
   
   devtools:
     restart:
