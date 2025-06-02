@@ -37,4 +37,4 @@ out/
 .vscode/
 
 ### 배포용 설정만 제외 ###
-application-prod.yml
+application-local.yml
