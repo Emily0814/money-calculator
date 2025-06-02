@@ -14,10 +14,10 @@ spring:
     username: ${DB_USERNAME:calc}
     password: ${DB_PASSWORD:calc1234}
   jpa:
-    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:}
     hibernate:
       ddl-auto: update
     show-sql: true
+    database-platform: ${SPRING_JPA_DATABASE_PLATFORM:}
     properties:
       hibernate:
         dialect: ${HIBERNATE_DIALECT:}
@@ -32,4 +32,4 @@ logging:
     com.ajaajas.calc: DEBUG
     root: INFO
 
-debug: false
+#debug: false
