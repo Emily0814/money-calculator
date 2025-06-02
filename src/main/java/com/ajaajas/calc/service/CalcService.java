@@ -4,12 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.NumberFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +18,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class CalcService {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
-	private final String API_KEY = "LpbGexSlwUFpoKJJftExQuhLv6wbYcNc";
 	
 	//Repository 마법 주입
 	@Autowired
@@ -138,24 +132,12 @@ public class CalcService {
         return result;
 	}
 	
-	//최근 영업일 계산
-	private String getLatestBusinessDate() {
-		
-		LocalDate today = LocalDate.now();
-		
-		//토요일(6)이면 금요일로, 일요일(7)이면 금요일로
-		while (today.getDayOfWeek() == DayOfWeek.SATURDAY || today.getDayOfWeek() == DayOfWeek.SUNDAY) {
-			today = today.minusDays(1);
-		}
-		
-		return today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-	}
-	
 	//환율 계산 기능 - ExchangeRate-API 활용
 	public double getExchangeRate(String fromCurrency, String toCurrency) {
 	    try {
 	        //ExchangeRate-API 사용 (무료)
-	        String url = "https://api.exchangerate-api.com/v6/latest/" + fromCurrency;
+	        String url = "https://api.frankfurter.app/latest?from=" + fromCurrency + "&to=" + toCurrency;
+
 	        
 	        System.out.println("환율 API 호출: " + url);
 	        
