@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
+    username: calc
+    password: calc1234
+    driver-class-name: oracle.jdbc.OracleDriver
