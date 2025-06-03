@@ -1,6 +1,6 @@
 # 💰 Money Calculator
 
-> > 개인 금융 관리를 위한 Spring Boot + Oracle 기반의 웹 애플리케이션  
+>  개인 금융 관리를 위한 Spring Boot + Oracle 기반의 웹 애플리케이션  
 > '금융 IT 개발자 되기' 프로젝트 중 하나
 
 ## 🎯 프로젝트 개요
