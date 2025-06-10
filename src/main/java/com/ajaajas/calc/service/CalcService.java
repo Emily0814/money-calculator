@@ -14,16 +14,45 @@ import com.ajaajas.calc.repository.CalculationHistoryRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * CalcService 클래스는 다양한 계산 기능을 제공하는 클래스
+ * - 기본 사칙연산
+ * - 단리 및 복리 계산
+ * - 대출 월 상환금 계산(등액상환 방식)
+ * - 실시간 환율 조회 및 환전 계산(ExchangeRate-API)
+ * - 모든 계산 내역을 DB에 저장 및 조회
+ * 
+ * @author ajaajas
+ * @version 1.0
+ * @since 2025
+ */
 @Service
 public class CalcService {
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	
-	//Repository 마법 주입
+	/**
+	 * 계산 내역을 저장하는 Repository 객체
+	 * Spring의 의존성 주입을 통해 자동으로 주입
+	 */
 	@Autowired
 	private CalculationHistoryRepository historyRepository;
 	
-	//기본 사칙연산
+	/**
+	 * 기본 사칙연산을 수행
+	 * 
+	 * 지원하는 연산자:
+	 * - "+": 덧셈
+	 * - "-": 뺄셈
+	 * - "*": 곱셈
+	 * - "/": 나눗셈(0으로 나누기 방지)
+	 * 
+	 * @param num1		첫 번째 피연산자
+	 * @param num2		두 번째 피연산자
+	 * @param operator	연산자(+, -, *, /)
+	 * @return 계산 결과
+	 * @throws IllegalArgumentException 잘못된 연산자이거나 0으로 나누기를 시도할 경우
+	 */
 	public double basicCalculate(double num1, double num2, String operator) {
 		System.out.println("=== basicCalculate 메서드 시작 ===");
 	    System.out.println("입력값: " + num1 + " " + operator + " " + num2);
@@ -81,7 +110,16 @@ public class CalcService {
 		return result;
 	}
 
-	//단리 계산
+	/**
+	 * 단리 이자를 계산
+	 * 
+	 * 공식: 원금 + (원금 * 이율 / 100 * 기간)
+	 * 
+	 * @param principal	원금(원)
+	 * @param rate		연 이율(%)
+	 * @param years		투자 기간(년)
+	 * @return  단리 적용 후 총 금액(원)
+	 */
 	public double calculateSimpleInterest(double principal, double rate, int years) {
 		double result = principal + (principal * rate / 100 * years);
 		
@@ -95,7 +133,16 @@ public class CalcService {
 	    return result;
 	}
 	
-	//복리 계산
+	/**
+	 * 복리 이자를 계산
+	 * 
+	 * 공식: 원금 * (1 + 이율 / 100)^기간
+	 * 
+	 * @param principal	원금(원)
+	 * @param rate		연 이율(%)
+	 * @param years		투자 기간(년)
+	 * @return  복리 적용 후 총 금액(원)
+	 */
 	public double calculateCompoundInterest(double principal, double rate, int years) {
 		double result = principal * Math.pow(1+rate/100, years);
 		
@@ -109,7 +156,17 @@ public class CalcService {
 		return result;
 	}
 	
-	//월 상환액 계산(등액상환)
+	/**
+	 * 대출의 월 상환액을 계산(등액상환 방식)
+	 * 
+	 * 이율이 0%인 경우: 원금을 상환개월수로 나눈 값
+	 * 이율이 있는 경우: 원리금균등상환 공식 적용
+	 * 
+	 * @param principal		대출 원금(원)
+	 * @param annualRate	연 이율(%)
+	 * @param months		상환 기간(개월)
+	 * @return  월 상환액(원, 소수점 둘째자리까지)
+	 */
 	public double calculateMonthlyPayment(double principal, double annualRate, int months) {
 		double result;
 		
@@ -132,7 +189,17 @@ public class CalcService {
         return result;
 	}
 	
-	//환율 계산 기능 - ExchangeRate-API 활용
+	/**
+	 * 두 통화 간의 환율을 조회
+	 * 
+	 * ExchangeRate-API(frankfurter.app)를 사용하여 실시간 환율을 가져옴
+	 * API 호출 실패 시 미리 정의된 더미 데이터를 반환
+	 * 
+	 * @param fromCurrency	기준 통화 코드(예: "USD", "KRW")
+	 * @param toCurrency	변환 대상 통화 코드(예: "EUR", "JPY")
+	 * @return  환율(1 기준통화 = ? 대상통화)
+	 * @throws RuntimeException 지원하지 않는 통화 코드인 경우
+	 */
 	public double getExchangeRate(String fromCurrency, String toCurrency) {
 	    try {
 	        //ExchangeRate-API 사용 (무료)
@@ -190,6 +257,17 @@ public class CalcService {
 	}
 	
 	//환전 계산
+	/**
+	 * 통화를 환전
+	 * 
+	 * 실시간 환율을 조회하여 금액을 변환
+	 * 결과는 소수점 둘째자리까지 반올림
+	 * 
+	 * @param amount		환전할 금액
+	 * @param fromCurrency	기준 통화 코드
+	 * @param toCurrency	변환할 통화 코드
+	 * @return  환전된 금액(소수점 둘째자리까지)
+	 */
 	public double convertCurrency(double amount, String fromCurrency, String toCurrency) {
 		double rate = getExchangeRate(fromCurrency, toCurrency);
 		double result = Math.round(amount * rate * 100.0) / 100.0;
@@ -205,6 +283,16 @@ public class CalcService {
 	}
 	
 	//DB 저장 공통 메서드
+	/**
+	 * 계산 결과를 DB에 저장
+	 * 
+	 * 모든 계산 유형(basic, interest, loan, exchange)에 대해 
+	 * 입력 데이터와 결과를 JSON 형태로 저장
+	 * 
+	 * @param calcType	계산 유형("basic", "interest", "loan", "exchange")
+	 * @param inputData 입력 데이터(JSON 형식 문자열)
+	 * @param result	계산 결과(문자열)
+	 */
 	private void saveCalculationHistory(String calcType, String inputData, String result) {
 	    try {
 	        CalculationHistory history = new CalculationHistory(calcType, inputData, result);
@@ -216,14 +304,32 @@ public class CalcService {
 	}
 	
 	//계산 기록 조회 메서드들
+	/**
+	 * 모든 계산 기록을 조회
+	 * 
+	 * @return  전체 계산 기록 리스트
+	 */
 	public List<CalculationHistory> getAllHistory() {
 	    return historyRepository.findAll();
 	}
 
+	/**
+	 * 특정 계산 유형의 기록만 조회
+	 * 
+	 * @param calcType	조회할 계산 유형("basic", "interest", "loan", "exchange")
+	 * @return	해당 유형의 계산 기록 리스트
+	 */
 	public List<CalculationHistory> getHistoryByType(String calcType) {
 	    return historyRepository.findByCalcType(calcType);
 	}
 
+	/**
+	 * 최근 계산 기록 10개를 조회
+	 * 
+	 * 생성일시 기준 내림차순으로 정렬되어 반환
+	 * 
+	 * @return 최근 계산 기록 10개 리스트
+	 */
 	public List<CalculationHistory> getRecentHistory() {
 	    return historyRepository.findTop10ByOrderByCreatedAtDesc();
 	}
